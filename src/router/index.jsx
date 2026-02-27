@@ -6,14 +6,14 @@ import ActivityPage from "../views/ActivityPage";
 const router = createBrowserRouter([
   {
     path: "/",
-    element: <MainLayout />, // Ini harus menjadi parent
+    element: <MainLayout />, 
     children: [
       {
-        index: true, // Ini akan merender Dashboard saat di path "/"
+        index: true,
         element: <Home />,
       },
       {
-        path: "activities", // Pathnya menjadi /activities
+        path: "activities", 
         element: <ActivityPage />,
       },
     ],

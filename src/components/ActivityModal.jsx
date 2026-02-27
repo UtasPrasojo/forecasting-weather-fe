@@ -1,26 +1,15 @@
 import { useState } from "react";
-import AsyncSelect from "react-select/async";
-import useWilayahStore from "../stores/useWilayahStore";
 
 const ActivityModal = ({ isOpen, onClose, onSubmit, initialData }) => {
-  const { searchWilayah } = useWilayahStore();
-
-  // Inisialisasi state LANGSUNG dari props
   const [formData, setFormData] = useState({
     name: initialData?.name || "",
     area_code: initialData?.area_code || "",
-    // Potong string tanggal agar sesuai format input datetime-local (YYYY-MM-DDThh:mm)
     activity_date: initialData?.activity_date
       ? initialData.activity_date.slice(0, 16)
       : "",
   });
 
   if (!isOpen) return null;
-
-  const loadOptions = (inputValue, callback) => {
-    if (inputValue.length < 3) return callback([]);
-    searchWilayah(inputValue).then(callback);
-  };
 
   const handleFormSubmit = (e) => {
     e.preventDefault();
@@ -45,7 +34,7 @@ const ActivityModal = ({ isOpen, onClose, onSubmit, initialData }) => {
                 Nama Kegiatan
               </label>
               <input
-                className="w-full border border-gray-300 p-2.5 rounded-lg outline-none focus:ring-2 focus:ring-blue-500 transition-all"
+                className="w-full border border-gray-300 p-2.5 rounded-lg outline-none focus:ring-2 focus:ring-blue-500"
                 value={formData.name}
                 onChange={(e) =>
                   setFormData({ ...formData, name: e.target.value })
@@ -54,27 +43,19 @@ const ActivityModal = ({ isOpen, onClose, onSubmit, initialData }) => {
               />
             </div>
 
-            <div>
-              <label className="block text-sm font-medium mb-1 text-gray-700">
-                Lokasi Wilayah
-              </label>
-              <AsyncSelect
-                cacheOptions
-                defaultOptions
-                loadOptions={loadOptions}
-                // Menampilkan label yang informatif
-                value={
-                  formData.area_code
-                    ? { value: formData.area_code, label: formData.area_code }
-                    : null
-                }
-                onChange={(opt) =>
-                  setFormData({ ...formData, area_code: opt ? opt.value : "" })
-                }
-                placeholder="Cari lokasi..."
-                isClearable
-              />
-            </div>
+            {/* Read-only Area Code saat edit */}
+            {initialData && (
+              <div>
+                <label className="block text-sm font-medium mb-1 text-gray-700 text-gray-400">
+                  Wilayah Terpilih (Sync Terakhir)
+                </label>
+                <input
+                  className="w-full bg-gray-100 border border-gray-200 p-2.5 rounded-lg text-gray-500 cursor-not-allowed"
+                  value={initialData.wilayah?.loc || initialData.area_code}
+                  disabled
+                />
+              </div>
+            )}
 
             <div>
               <label className="block text-sm font-medium mb-1 text-gray-700">
@@ -96,15 +77,15 @@ const ActivityModal = ({ isOpen, onClose, onSubmit, initialData }) => {
             <button
               type="button"
               onClick={onClose}
-              className="px-5 py-2.5 bg-gray-100 rounded-lg text-sm font-semibold text-gray-600 hover:bg-gray-200"
+              className="px-5 py-2.5 bg-gray-100 rounded-lg text-sm text-gray-600"
             >
               Batal
             </button>
             <button
               type="submit"
-              className="px-5 py-2.5 bg-blue-600 text-white rounded-lg shadow-lg hover:bg-blue-700 text-sm font-semibold transition-transform active:scale-95"
+              className="px-5 py-2.5 bg-blue-600 text-white rounded-lg shadow-lg"
             >
-              Simpan
+              {initialData ? "Simpan Perubahan" : "Simpan"}
             </button>
           </div>
         </form>

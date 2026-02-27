@@ -15,7 +15,6 @@ const ActivityTable = ({ data, onEdit, onDelete }) => {
         </thead>
         <tbody className="divide-y divide-gray-200 bg-white">
           {data.map((item) => (
-            // PERBAIKAN: Gunakan item.id (huruf kecil) sebagai key unik
             <tr key={item.id} className="hover:bg-gray-50 transition-colors">
               <td className="px-6 py-4 font-medium text-gray-800">
                 {item.name}
@@ -48,7 +47,7 @@ const ActivityTable = ({ data, onEdit, onDelete }) => {
                     <Edit2 size={18} />
                   </button>
                   <button 
-                    onClick={() => onDelete(item.id)} // Gunakan item.id
+                    onClick={() => onDelete(item.id)}
                     className="p-2 text-red-600 hover:bg-red-50 rounded-md transition-colors"
                     title="Hapus Kegiatan"
                   >

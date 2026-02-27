@@ -12,7 +12,6 @@ const MainLayout = () => {
   return (
     <div className="flex min-h-screen w-full bg-gray-50">
       
-      {/* SIDEBAR - Tambahkan left-0 dan z-50 */}
       <aside className="w-64 bg-gray-900 text-white flex flex-col fixed inset-y-0 left-0 z-50 shadow-2xl">
         <div className="p-6 flex items-center gap-3 border-b border-gray-800">
           <div className="bg-blue-600 p-1.5 rounded-lg">
@@ -34,8 +33,6 @@ const MainLayout = () => {
         </nav>
       </aside>
 
-      {/* MAIN CONTENT AREA */}
-      {/* ml-64 sangat penting agar konten tidak tertutup sidebar yang fixed */}
       <div className="flex-1 ml-64 flex flex-col min-h-screen w-full">
         <header className="h-16 bg-white border-b border-gray-200 flex items-center px-8 sticky top-0 z-10">
           <h2 className="text-sm font-bold text-gray-500 uppercase tracking-widest">

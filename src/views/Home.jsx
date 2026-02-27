@@ -32,11 +32,7 @@ const Home = () => {
 
   const { searchWilayah } = useWilayahStore();
 
-  // adm4 kini menyimpan objek { value: "kode", label: "kode - nama" }
-  const [selectedWilayah, setSelectedWilayah] = useState({
-    value: "31.71.01.1001",
-    label: "KELURAHAN GAMBIR", // Sekarang hanya loc, tanpa kode di depan
-  });
+  const [selectedWilayah, setSelectedWilayah] = useState(null);
   useEffect(() => {
     fetchDashboard();
   }, [fetchDashboard]);
@@ -47,7 +43,6 @@ const Home = () => {
     }
   };
 
-  // Fungsi untuk memuat opsi dari API Wilayah
   const loadOptions = (inputValue, callback) => {
     if (inputValue.length < 3) return callback([]);
     searchWilayah(inputValue).then((options) => callback(options));
@@ -82,7 +77,6 @@ const Home = () => {
               onChange={(option) => setSelectedWilayah(option)}
               placeholder="Cari Kelurahan / Kode ADM4..."
               className="text-sm flex-1"
-              // Styling agar menyatu dengan desain Tailwind
               styles={{
                 control: (base) => ({
                   ...base,
@@ -108,65 +102,73 @@ const Home = () => {
 
       {/* Charts Section */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-        <div className="bg-white p-6 rounded-xl shadow border border-gray-100 h-96">
+        {/* Bar Chart Container */}
+        <div className="bg-white p-6 rounded-xl shadow border border-gray-100 min-w-0">
           <h3 className="text-lg font-semibold mb-4 italic text-gray-700">
             Rata-rata Suhu Harian (°C)
           </h3>
-          <ResponsiveContainer width="100%" height="100%">
-            <BarChart data={columnData}>
-              <CartesianGrid strokeDasharray="3 3" vertical={false} />
-              <XAxis
-                dataKey="day"
-                tickFormatter={(date) =>
-                  new Date(date).toLocaleDateString("id-ID", {
-                    weekday: "short",
-                  })
-                }
-              />
-              <YAxis domain={[0, 40]} />
-              <Tooltip
-                labelFormatter={(date) =>
-                  new Date(date).toLocaleDateString("id-ID")
-                }
-              />
-              <Bar
-                dataKey="avg_temp"
-                fill="#3b82f6"
-                radius={[4, 4, 0, 0]}
-                name="Suhu Avg"
-              />
-            </BarChart>
-          </ResponsiveContainer>
+          <div className="h-[300px] w-full">
+            <ResponsiveContainer width="100%" height="100%">
+              <BarChart
+                data={columnData}
+                margin={{ top: 10, right: 10, left: -20, bottom: 0 }} 
+              >
+                <CartesianGrid strokeDasharray="3 3" vertical={false} />
+                <XAxis
+                  dataKey="day"
+                  tick={{ fontSize: 12 }}
+                  tickFormatter={(date) =>
+                    new Date(date).toLocaleDateString("id-ID", {
+                      weekday: "short",
+                    })
+                  }
+                />
+                <YAxis tick={{ fontSize: 12 }} domain={[0, 40]} />
+                <Tooltip
+                  labelFormatter={(date) =>
+                    new Date(date).toLocaleDateString("id-ID")
+                  }
+                />
+                <Bar
+                  dataKey="avg_temp"
+                  fill="#3b82f6"
+                  radius={[4, 4, 0, 0]}
+                  name="Suhu Avg"
+                />
+              </BarChart>
+            </ResponsiveContainer>
+          </div>
         </div>
 
-        <div className="bg-white p-6 rounded-xl shadow border border-gray-100 h-96">
+        {/* Pie Chart Container */}
+        <div className="bg-white p-6 rounded-xl shadow border border-gray-100 min-w-0">
           <h3 className="text-lg font-semibold mb-4 italic text-gray-700">
             Distribusi Kondisi Cuaca
           </h3>
-          <ResponsiveContainer width="100%" height="100%">
-            <PieChart>
-              <Pie
-                data={pieData}
-                dataKey="total"
-                nameKey="category"
-                cx="50%"
-                cy="50%"
-                outerRadius={80}
-                label={({ category, percent }) =>
-                  `${category} ${(percent * 100).toFixed(0)}%`
-                }
-              >
-                {pieData.map((entry, index) => (
-                  <Cell
-                    key={`cell-${index}`}
-                    fill={COLORS[index % COLORS.length]}
-                  />
-                ))}
-              </Pie>
-              <Tooltip />
-              <Legend />
-            </PieChart>
-          </ResponsiveContainer>
+          <div className="h-[300px] w-full">
+            <ResponsiveContainer width="100%" height="100%">
+              <PieChart>
+                <Pie
+                  data={pieData}
+                  dataKey="total"
+                  nameKey="category"
+                  cx="50%"
+                  cy="50%"
+                  outerRadius="80%"
+                  label={({ percent }) => `${(percent * 100).toFixed(0)}%`}
+                >
+                  {pieData.map((entry, index) => (
+                    <Cell
+                      key={`cell-${index}`}
+                      fill={COLORS[index % COLORS.length]}
+                    />
+                  ))}
+                </Pie>
+                <Tooltip />
+                <Legend verticalAlign="bottom" height={36} />
+              </PieChart>
+            </ResponsiveContainer>
+          </div>
         </div>
       </div>
 

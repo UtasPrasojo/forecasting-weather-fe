@@ -5,7 +5,6 @@ const useActivityStore = create((set, get) => ({
   activities: [],
   loading: false,
 
-  // Fetch semua kegiatan
   fetchActivities: async () => {
     set({ loading: true });
     try {
@@ -18,17 +17,15 @@ const useActivityStore = create((set, get) => ({
     }
   },
 
-  // Simpan kegiatan (Create)
   addActivity: async (formData) => {
     try {
       const apiUrl = import.meta.env.VITE_API_URL;
-      // Backend mengharapkan format ISO8601 untuk activity_date
       const payload = {
         ...formData,
         activity_date: new Date(formData.activity_date).toISOString(),
       };
       await axios.post(`${apiUrl}/activity`, payload);
-      get().fetchActivities(); // Refresh tabel
+      get().fetchActivities();
       return true;
     } catch (err) {
       console.error("Gagal menambah kegiatan:", err);
@@ -36,7 +33,6 @@ const useActivityStore = create((set, get) => ({
     }
   },
 
-  // Update kegiatan
   updateActivity: async (id, formData) => {
     try {
       const apiUrl = import.meta.env.VITE_API_URL;
@@ -45,7 +41,7 @@ const useActivityStore = create((set, get) => ({
         activity_date: new Date(formData.activity_date).toISOString(),
       };
       await axios.put(`${apiUrl}/activity/update?id=${id}`, payload);
-      get().fetchActivities(); // Refresh tabel
+      get().fetchActivities();
       return true;
     } catch (err) {
       console.error("Gagal update kegiatan:", err);
