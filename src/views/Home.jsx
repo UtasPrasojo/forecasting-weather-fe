@@ -13,7 +13,9 @@ import {
   Legend,
 } from "recharts";
 import { RefreshCw, MapPin } from "lucide-react";
+import AsyncSelect from "react-select/async";
 import useWeatherStore from "../stores/useWeatherStore";
+import useWilayahStore from "../stores/useWilayahStore";
 
 const COLORS = ["#0088FE", "#00C49F", "#FFBB28", "#FF8042", "#8884d8"];
 
@@ -27,14 +29,28 @@ const Home = () => {
     fetchDashboard,
     syncWeather,
   } = useWeatherStore();
-  const [adm4, setAdm4] = useState("31.71.01.1001");
 
+  const { searchWilayah } = useWilayahStore();
+
+  // adm4 kini menyimpan objek { value: "kode", label: "kode - nama" }
+  const [selectedWilayah, setSelectedWilayah] = useState({
+    value: "31.71.01.1001",
+    label: "KELURAHAN GAMBIR", // Sekarang hanya loc, tanpa kode di depan
+  });
   useEffect(() => {
     fetchDashboard();
   }, [fetchDashboard]);
 
   const handleSync = () => {
-    syncWeather(adm4);
+    if (selectedWilayah) {
+      syncWeather(selectedWilayah.value);
+    }
+  };
+
+  // Fungsi untuk memuat opsi dari API Wilayah
+  const loadOptions = (inputValue, callback) => {
+    if (inputValue.length < 3) return callback([]);
+    searchWilayah(inputValue).then((options) => callback(options));
   };
 
   if (loading)
@@ -56,19 +72,29 @@ const Home = () => {
         </div>
 
         <div className="flex items-center gap-2 bg-white p-2 rounded-lg shadow-sm border">
-          <div className="flex items-center gap-2 px-3 border-r">
+          <div className="flex items-center gap-2 px-3 border-r min-w-[300px]">
             <MapPin size={18} className="text-gray-400" />
-            <input
-              type="text"
-              value={adm4}
-              onChange={(e) => setAdm4(e.target.value)}
-              placeholder="Masukkan ADM4"
-              className="outline-none text-sm w-32"
+            <AsyncSelect
+              cacheOptions
+              loadOptions={loadOptions}
+              defaultOptions
+              value={selectedWilayah}
+              onChange={(option) => setSelectedWilayah(option)}
+              placeholder="Cari Kelurahan / Kode ADM4..."
+              className="text-sm flex-1"
+              // Styling agar menyatu dengan desain Tailwind
+              styles={{
+                control: (base) => ({
+                  ...base,
+                  border: 0,
+                  boxShadow: "none",
+                }),
+              }}
             />
           </div>
           <button
             onClick={handleSync}
-            disabled={syncLoading}
+            disabled={syncLoading || !selectedWilayah}
             className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-md transition-all disabled:opacity-50"
           >
             <RefreshCw
@@ -156,7 +182,7 @@ const Home = () => {
             <thead className="bg-gray-50 text-gray-600 text-sm uppercase">
               <tr>
                 <th className="px-6 py-4 font-bold">Waktu Lokal</th>
-                <th className="px-6 py-4 font-bold">Wilayah (ADM4)</th>
+                <th className="px-6 py-4 font-bold">Wilayah </th>
                 <th className="px-6 py-4 font-bold">Kondisi</th>
                 <th className="px-6 py-4 font-bold">Suhu</th>
                 <th className="px-6 py-4 font-bold">Kelembapan</th>
@@ -169,7 +195,7 @@ const Home = () => {
                     {new Date(item.local_datetime).toLocaleString("id-ID")}
                   </td>
                   <td className="px-6 py-4 text-sm font-medium text-gray-700">
-                    {item.AreaCode}
+                    {item.wilayah?.loc || "Wilayah tidak ditemukan"}
                   </td>
                   <td className="px-6 py-4">
                     <span className="px-3 py-1 bg-blue-50 text-blue-700 rounded-full text-xs font-semibold">

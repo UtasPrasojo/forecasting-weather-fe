@@ -1,13 +1,17 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import ActivityTable from "../components/ActivityTable";
 import ActivityModal from "../components/ActivityModal";
+import useActivityStore from "../stores/useActivityStore"; // Import store
 
 const ActivityPage = () => {
-  const [activities, setActivities] = useState([
-    { ID: 1, name: "Meeting Telkom", area_code: "31.71.01", activity_date: "2024-05-20T10:00:00Z", weather_status: "Cerah Berawan" }
-  ]);
+  const { activities, loading, fetchActivities, addActivity, updateActivity, deleteActivity } = useActivityStore();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedData, setSelectedData] = useState(null);
+
+  // Ambil data saat halaman dibuka
+  useEffect(() => {
+    fetchActivities();
+  }, []);
 
   const handleAdd = () => {
     setSelectedData(null);
@@ -20,34 +24,46 @@ const ActivityPage = () => {
   };
 
   const handleDelete = (id) => {
-    if(window.confirm("Yakin ingin menghapus?")) {
-      setActivities(activities.filter(a => a.ID !== id));
+    if(window.confirm("Yakin ingin menghapus kegiatan ini?")) {
+      deleteActivity(id);
     }
   };
 
-  const handleSubmit = (formData) => {
-    console.log("Data dikirim ke API:", formData);
-    // Logika Fetch POST atau PUT di sini
-    setIsModalOpen(false);
+  const handleSubmit = async (formData) => {
+    let success;
+    if (selectedData) {
+      success = await updateActivity(selectedData.id, formData);
+    } else {
+      success = await addActivity(formData);
+    }
+
+    if (success) setIsModalOpen(false);
   };
 
   return (
     <div className="p-8 max-w-6xl mx-auto">
       <div className="flex justify-between items-center mb-6">
-        <h1 className="text-2xl font-bold text-gray-800">Manajemen Kegiatan</h1>
+        <div>
+          <h1 className="text-2xl font-bold text-gray-800">Manajemen Kegiatan</h1>
+          <p className="text-sm text-gray-500">Data cuaca akan otomatis sinkron saat disimpan</p>
+        </div>
         <button 
           onClick={handleAdd}
-          className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition"
+          className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 shadow-lg shadow-blue-200 transition"
         >
           + Tambah Kegiatan
         </button>
       </div>
 
-      <ActivityTable 
-        data={activities} 
-        onEdit={handleEdit} 
-        onDelete={handleDelete} 
-      />
+      {loading ? (
+        <div className="text-center p-10 text-gray-500">Memuat data...</div>
+      ) : (
+        <ActivityTable 
+          data={activities} 
+          onEdit={handleEdit} 
+          onDelete={handleDelete} 
+        />
+      )}
 
       <ActivityModal 
         isOpen={isModalOpen} 
