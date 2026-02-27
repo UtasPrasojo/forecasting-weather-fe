@@ -67,7 +67,7 @@ const Home = () => {
         </div>
 
         <div className="flex items-center gap-2 bg-white p-2 rounded-lg shadow-sm border">
-          <div className="flex items-center gap-2 px-3 border-r min-w-[300px]">
+          <div className="flex items-center gap-2 px-3 border-r min-w-75">
             <MapPin size={18} className="text-gray-400" />
             <AsyncSelect
               cacheOptions

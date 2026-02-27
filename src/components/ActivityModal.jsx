@@ -1,13 +1,13 @@
 import { useState } from "react";
 
 const ActivityModal = ({ isOpen, onClose, onSubmit, initialData }) => {
-  const [formData, setFormData] = useState({
+  const [formData, setFormData] = useState(() => ({
     name: initialData?.name || "",
     area_code: initialData?.area_code || "",
     activity_date: initialData?.activity_date
       ? initialData.activity_date.slice(0, 16)
       : "",
-  });
+  }));
 
   if (!isOpen) return null;
 

@@ -5,12 +5,28 @@ const useActivityStore = create((set, get) => ({
   activities: [],
   loading: false,
 
-  fetchActivities: async () => {
+  fetchActivities: async ({
+    search = "",
+    sortBy = "activity_date",
+    order = "desc",
+  } = {}) => {
     set({ loading: true });
+
     try {
       const apiUrl = import.meta.env.VITE_API_URL;
-      const response = await axios.get(`${apiUrl}/activity`);
-      set({ activities: response.data || [], loading: false });
+
+      const response = await axios.get(`${apiUrl}/activity`, {
+        params: {
+          search,
+          sort_by: sortBy,
+          order,
+        },
+      });
+
+      set({
+        activities: response.data || [],
+        loading: false,
+      });
     } catch (err) {
       console.error("Gagal mengambil kegiatan:", err);
       set({ loading: false });
